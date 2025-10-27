@@ -8,17 +8,17 @@ import Popup from "../components/popup"; // adjust the path depending on your fo
 export default function DataScreen() { 
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
-    const [item, setItem] = useState(null);
+    const [item, setItem] = useState<any>(null);
     const [inventory, setInventory] = useState([
-        { id: 1, name: "1.5 White Adhesive (32 ct.)", quantity: 12 },
-        { id: 2, name: "1\" White Adhesive (48 ct.)", quantity: 8 },
-        { id: 3, name: "2\" White Adhesive (24 ct.)", quantity: 15 },
-        { id: 4, name: "3\" White Adhesive (12 ct.)", quantity: 5 },
-        { id: 5, name: "1.5 Black Adhesive (32 ct.)", quantity: 10 },
-        { id: 6, name: "1\" Black Adhesive (48 ct.)", quantity: 7 },
-        { id: 7, name: "2\" Black Adhesive (24 ct.)", quantity: 14 }, 
-        { id: 8, name: "3\" Black Adhesive (12 ct.)", quantity: 6 },
-        { id: 9, name: "1.5 Clear Adhesive (32 ct.)", quantity: 1100 },  
+        { id: 1, name: "1.5 White Adhesive (32 ct.)", quantity: 70, minQuantity: 50 },
+        { id: 2, name: "1\" White Adhesive (48 ct.)", quantity: 8, minQuantity: 2 },
+        { id: 3, name: "2\" White Adhesive (24 ct.)", quantity: 15, minQuantity: 3 },
+        { id: 4, name: "3\" White Adhesive (12 ct.)", quantity: 5, minQuantity: 2 },
+        { id: 5, name: "1.5 Black Adhesive (32 ct.)", quantity: 10, minQuantity: 2 },
+        { id: 6, name: "1\" Black Adhesive (48 ct.)", quantity: 7, minQuantity: 2 },
+        { id: 7, name: "2\" Black Adhesive (24 ct.)", quantity: 14, minQuantity: 30 }, 
+        { id: 8, name: "3\" Black Adhesive (12 ct.)", quantity: 6, minQuantity: 20 },
+        { id: 9, name: "1.5 Clear Adhesive (32 ct.)", quantity: 1100, minQuantity: 50 },  
     ]);
 
     const increment = (id) => {
@@ -66,13 +66,14 @@ export default function DataScreen() {
         setItem(null);
     }
 
-    const handleSaveItem = (itemData) => {
+    const handleSaveItem = (itemData: any) => {
         // adding new item
         if (itemData.id == -1) {
             setInventory(prev => [...prev, {
                 id: prev.length + 1,
                 name: itemData.itemName,
-                quantity: itemData.quantity
+                quantity: itemData.quantity,
+                minQuantity: itemData.minQuantity ?? 0
             }]);
         }
         // editing existing item
@@ -80,7 +81,7 @@ export default function DataScreen() {
             setInventory(prev =>
                 prev.map(item =>
                     item.id === itemData.id
-                        ? { ...item, name: itemData.itemName, quantity: itemData.quantity }
+                        ? { ...item, name: itemData.itemName, quantity: itemData.quantity, minQuantity: itemData.minQuantity ?? item.minQuantity }
                         : item
                 )
             );
@@ -92,7 +93,7 @@ export default function DataScreen() {
             {/* Top Row */}
             <Stack.Screen options={{headerShown: false}} />
             <View style={styles.topRow}>    
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <TouchableOpacity onPress={() => router.push({pathname: '/home'})} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
 
@@ -115,7 +116,7 @@ export default function DataScreen() {
                 id: item.id,
                 itemName: item.name,
                 quantity: item.quantity,
-                minQuantity: 0 // You can adjust this as needed
+                minQuantity: item.minQuantity // You can adjust this as needed
             } : undefined }
             >
                 
@@ -126,7 +127,13 @@ export default function DataScreen() {
                 {inventory.map((item, index) => (
                     <View key={index} style={styles.dataRowContainer}>
                         <TouchableOpacity onPress={() => handleEditItem(item)}>
-                            <Text style={styles.itemName}>{item.name}</Text>
+                            <Text style={[
+                                styles.itemName,
+                                item.quantity < item.minQuantity ? styles.itemNameLow : undefined
+                            ]}>
+                                {item.quantity < item.minQuantity ? '⚠ ' : ''}{item.name}
+                            </Text>
+                            {/* <Text style={styles.minText}>Min: {item.minQuantity}</Text> */}
                         </TouchableOpacity>
                         
 
@@ -143,7 +150,7 @@ export default function DataScreen() {
                 ))}
             </ScrollView>
             {/* Floating Action Button */}
-            <TouchableOpacity style={styles.fab} onPress={() => setShowModal(true)}>
+            <TouchableOpacity style={styles.fab} onPress={() => { setItem(null); setShowModal(true); }}>
                 <Ionicons name="add" size={32} color="#fff" />
             </TouchableOpacity>
         </View>
@@ -201,6 +208,15 @@ const styles = StyleSheet.create({
     itemName: {
         flex: 1,
         fontSize: 16,
+        
+    },
+    itemNameLow: {
+        color: 'red',
+    },
+    minText: {
+        fontSize: 12,
+        color: '#666',
+        marginTop: 4,
     },
     counterGroup: {
         flexDirection: 'row',
@@ -214,12 +230,14 @@ const styles = StyleSheet.create({
     counterText: {
         fontSize: 25,
         fontWeight: "bold",
+        
     },
     counterValue: {
         fontSize: 20,
         // marginHorizontal: 10,
         minWidth: 40,
-        textAlign: "center"
+        textAlign: "center",
+        
     },
     scrollContainer: {
         flexGrow: 1,

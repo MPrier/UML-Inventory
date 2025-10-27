@@ -41,6 +41,7 @@ export default function Popup({
         setItemName('');
         setQuantity('');
         setMinQuantity('');
+
     };
     console.log("Popup initialValues:", initialValues);
     // Reset form when modal becomes visible
@@ -91,6 +92,7 @@ export default function Popup({
                         {/* Item Name Input */}
                         <TextInput
                         placeholder="Item Name"
+                        placeholderTextColor='grey'
                         style={styles.input}
                         value={itemName}
                         onChangeText={setItemName}
@@ -99,6 +101,7 @@ export default function Popup({
                         {/* Quantity Input */}
                         <TextInput
                         placeholder="Quantity"
+                        placeholderTextColor='grey'
                         style={styles.input}
                         value={quantity}
                         onChangeText={setQuantity}
@@ -108,6 +111,7 @@ export default function Popup({
                         {/* Minimum Quantity Input */}
                         <TextInput
                         placeholder="Minimum Quantity (for warning)"
+                        placeholderTextColor='grey'
                         style={styles.input}
                         value={minQuantity}
                         onChangeText={setMinQuantity}
