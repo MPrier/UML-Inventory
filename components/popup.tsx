@@ -1,10 +1,80 @@
-import React, { useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TextInput } from "react-native";
+import React, { useEffect, useState } from "react";
+import { KeyboardAvoidingView, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-export default function Popup({ visible, onClose, children }) {
-    const [itemName, setItemName] = useState("");
-    const [quantity, setQuantity] = useState("");
-    const [minQuantity, setMinQuantity] = useState("");
+interface ItemData {
+    id: number;
+    itemName: string;
+    quantity: number;
+    minQuantity: number;
+}
+
+interface PopupProps {
+    visible: boolean;
+    onClose: () => void;
+    initialValues?: {
+        id: number;
+        itemName: string;
+        quantity: number | string;
+        minQuantity: number | string;
+    };
+    onSave: (data: ItemData) => void;
+}
+
+export default function Popup({ 
+    visible, 
+    onClose, 
+    initialValues = {
+        id: -1,
+        itemName: '',
+        quantity: '',
+        minQuantity: ''
+    },
+    onSave 
+}: PopupProps) {
+    const [itemName, setItemName] = useState(initialValues.itemName);
+    const [quantity, setQuantity] = useState(initialValues.quantity.toString());
+    const [minQuantity, setMinQuantity] = useState(initialValues.minQuantity.toString());
+    const [id, setId] = useState(initialValues.id);
+    const [mode, setMode] = useState('');
+
+    const resetForm = () => {
+        setItemName('');
+        setQuantity('');
+        setMinQuantity('');
+    };
+    console.log("Popup initialValues:", initialValues);
+    // Reset form when modal becomes visible
+    useEffect(() => {
+        if (visible) {
+            if (initialValues.itemName != '') {
+                setItemName(initialValues.itemName);
+                setQuantity(initialValues.quantity.toString());
+                setMinQuantity(initialValues.minQuantity.toString());
+                setId(initialValues.id);
+                setMode('edit');
+            } else {
+                resetForm();
+                setMode('add');
+            }
+        }
+    }, [visible]);
+
+    const handleClose = () => {
+        // resetForm();
+        onClose();
+    };
+
+    const handleSave = () => {
+        const itemData = {
+            id,
+            itemName,
+            quantity: Number(quantity),
+            minQuantity: Number(minQuantity)
+        };
+        onSave(itemData);
+        // resetForm();
+        onClose();
+    };
 
     return (
         <KeyboardAvoidingView
@@ -14,7 +84,9 @@ export default function Popup({ visible, onClose, children }) {
             <Modal visible={visible} transparent animationType="fade">
                 <View style={styles.overlay}>
                     <View style={styles.modal}>
-                        <Text style={styles.title}>Add Inventory Item</Text>
+                        <Text style={styles.title}>
+                            {mode === 'add' ? 'Add Inventory Item' : 'Edit Inventory Item'}
+                        </Text>
 
                         {/* Item Name Input */}
                         <TextInput
@@ -43,16 +115,12 @@ export default function Popup({ visible, onClose, children }) {
                         />
 
                         <View style={styles.buttonRow}>
-                            <TouchableOpacity onPress={onClose} style={styles.button}>
+                            <TouchableOpacity onPress={handleClose} style={styles.button}>
                                 <Text style={styles.buttonText}>Cancel</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity 
-                                onPress={() => {
-                                // You’ll hook this into your backend or state later
-                                console.log("Item:", itemName, "Qty:", quantity, "Min:", minQuantity);
-                                onClose();
-                                }} 
+                                onPress={handleSave}
                                 style={[styles.button, styles.saveButton]}
                             >
                                 <Text style={[styles.buttonText, { color: "#fff" }]}>Save</Text>

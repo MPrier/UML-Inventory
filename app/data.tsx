@@ -8,6 +8,7 @@ import Popup from "../components/popup"; // adjust the path depending on your fo
 export default function DataScreen() { 
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
+    const [item, setItem] = useState(null);
     const [inventory, setInventory] = useState([
         { id: 1, name: "1.5 White Adhesive (32 ct.)", quantity: 12 },
         { id: 2, name: "1\" White Adhesive (48 ct.)", quantity: 8 },
@@ -38,6 +39,11 @@ export default function DataScreen() {
         );
     };
 
+    const handleEditItem = (item) => {
+        setItem(item);
+        setShowModal(true);
+       
+    }
     const handleAddItem = () => {
         const newItem = {
             id: inventory.length + 1,
@@ -54,6 +60,32 @@ export default function DataScreen() {
     const handleRefresh = () => {
         console.log("Refresh button pressed");
     };
+
+    const handlePopUpClose = () => {
+        setShowModal(false);
+        setItem(null);
+    }
+
+    const handleSaveItem = (itemData) => {
+        // adding new item
+        if (itemData.id == -1) {
+            setInventory(prev => [...prev, {
+                id: prev.length + 1,
+                name: itemData.itemName,
+                quantity: itemData.quantity
+            }]);
+        }
+        // editing existing item
+        else {
+            setInventory(prev =>
+                prev.map(item =>
+                    item.id === itemData.id
+                        ? { ...item, name: itemData.itemName, quantity: itemData.quantity }
+                        : item
+                )
+            );
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -78,19 +110,25 @@ export default function DataScreen() {
                 </View>
             </View>
 
-            <Popup visible={showModal} onClose={() => setShowModal(false)}>
-                {/* <Text style={{fontSize: 18, fontWeight: "bold", marginBottom: 10}}>Add New Item</Text>
-                <Text>This is a hardcoded item for demonstration.</Text>
-                <TouchableOpacity onPress={() => { handleAddItem(); setShowModal(false); }} style={{marginTop: 20, padding: 10, backgroundColor: "#2e86de", borderRadius: 5}}>
-                    <Text style={{color: "#fff"}}>Add Item</Text>
-                </TouchableOpacity> */}
+            <Popup visible={showModal} onClose={handlePopUpClose} onSave={handleSaveItem}
+            initialValues={ item ? {
+                id: item.id,
+                itemName: item.name,
+                quantity: item.quantity,
+                minQuantity: 0 // You can adjust this as needed
+            } : undefined }
+            >
+                
                 
             </Popup>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {inventory.map((item, index) => (
                     <View key={index} style={styles.dataRowContainer}>
-                        <Text style={styles.itemName}>{item.name}</Text>
+                        <TouchableOpacity onPress={() => handleEditItem(item)}>
+                            <Text style={styles.itemName}>{item.name}</Text>
+                        </TouchableOpacity>
+                        
 
                         <View style={styles.counterGroup}>
                             <TouchableOpacity onPress={() => decrement(item.id)} style={styles.counterButton}>
