@@ -41,9 +41,11 @@ export default function Popup({
         setItemName('');
         setQuantity('');
         setMinQuantity('');
+        setId(-1);
 
     };
     console.log("Popup initialValues:", initialValues);
+    console.log("id", id);
     // Reset form when modal becomes visible
     useEffect(() => {
         if (visible) {

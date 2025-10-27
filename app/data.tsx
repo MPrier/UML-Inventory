@@ -86,6 +86,7 @@ export default function DataScreen() {
                 )
             );
         }
+        // setItem(null);
     }
 
     return (
