@@ -146,7 +146,7 @@ export default function HomeScreen() {
                     ))}
                 </View>
             ) : null}       
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView contentContainerStyle={[    styles.scrollContainer, {paddingBottom: 150}]}>
             <View style={styles.container}>
             
                 {expanded.type && (
@@ -209,6 +209,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     fullScreen: {
         paddingTop: 40, // for status bar space
+        paddingBottom: 110,
         flex: 1,
         backgroundColor: '#fff',
     },
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         marginTop: 20,
-        marginBottom: 10,
+        // marginBottom: 10,
     },
     tab: {
         paddingVertical: 10,
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flexGrow: 1,
-        paddingBottom: 40,
+        
     },
     buttonWrapper: {
         
