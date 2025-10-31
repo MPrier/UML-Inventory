@@ -67,10 +67,12 @@ export default function DataScreen() {
     }
 
     const handleSaveItem = (itemData: any) => {
+        const lasItem = inventory[inventory.length - 1];
+
         // adding new item
         if (itemData.id == -1) {
             setInventory(prev => [...prev, {
-                id: prev.length + 1,
+                id: lasItem ? lasItem.id + 1 : 1,
                 name: itemData.itemName,
                 quantity: itemData.quantity,
                 minQuantity: itemData.minQuantity ?? 0
@@ -98,7 +100,7 @@ export default function DataScreen() {
             {/* Top Row */}
             <Stack.Screen options={{headerShown: false}} />
             <View style={styles.topRow}>    
-                <TouchableOpacity onPress={() => router.push({pathname: '/home'})} style={styles.backButton}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
 

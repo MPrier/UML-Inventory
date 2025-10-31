@@ -47,7 +47,7 @@ export default function Popup({
   const [id, setId] = useState(initialValues.id);
   const [mode, setMode] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-
+  console.log(id);
   useEffect(() => {
     setShowDeleteConfirmation(false);
     if (visible) {
@@ -76,6 +76,12 @@ export default function Popup({
       quantity: Number(quantity),
       minQuantity: Number(minQuantity),
     };
+
+    if (itemName.trim() === "" || quantity.trim() === "" || isNaN(itemData.minQuantity)) {
+      alert("Please fill in all fields correctly.");
+      return;
+    }
+
     onSave(itemData);
     onClose();
   };
@@ -243,6 +249,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderColor: "#ff3b30",
+    
   },
   deleteButtonText: {
     fontSize: 16,
