@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter, Stack } from "expo-router";
+import { Dropdown } from 'react-native-element-dropdown';
 
 export default function HomeScreen() {
     const router = useRouter();
     const [expanded, setExpanded] = useState({ type: null, category: null });
     const [activeTab, setActiveTab] = useState("Training Room"); // default tab
-
+    const [selectedBuilding, setSelectedBuilding] = useState(null);
     const lowItems = {
         Tape: ["White Tape", "Elastic Tape"],
         Hydration: ["Water Bottles", "Electrolyte Mix", "Ice Bags", "Cups"],
@@ -43,21 +44,21 @@ export default function HomeScreen() {
       lowItems: [],
       lastUpdated: "2024-05-29T12:15:00",
     },
-    // {
-    //   name: "Extra Tape",
-    //   lowItems: ['Sticky stuff', 'More sticky stuff'],
-    //   lastUpdated: "2024-08-04T15:08:00",
-    // },
+    {
+      name: "Extra Tape",
+      lowItems: ['Sticky stuff', 'More sticky stuff'],
+      lastUpdated: "2024-08-04T15:08:00",
+    },
     {
       name: "Other",
       lowItems: ['Poop', 'More poop', 'Even more poop'],
       lastUpdated: "2024-08-04T15:08:00",
     },
-    // {
-    //   name: "Tests",
-    //   lowItems: ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10'],
-    //   lastUpdated: "2024-08-04T15:08:00",
-    // },
+    {
+      name: "Tests",
+      lowItems: ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9', 'test10'],
+      lastUpdated: "2024-08-04T15:08:00",
+    },
     
   ];
 
@@ -82,6 +83,13 @@ export default function HomeScreen() {
         lowItems: ['Heel Lifts', 'Cushioning Pads'],
         lastUpdated: "2024-05-22T09:10:00",
         },
+    ];
+
+    const dropDownData = [
+        { label: 'Kennedy', value: '1' },
+        { label: 'Mahoney', value: '2' },
+        { label: 'LeLacheur', value: '3' },
+        { label: 'Tsongas', value: '4' },
     ];
     
     const categories = activeTab === "Training Room" ? trainingRoomCategories : storageRoomCategories;
@@ -115,25 +123,29 @@ export default function HomeScreen() {
 	return (
         <View style={styles.fullScreen}>
             <Stack.Screen options={{headerShown: false}} />
+            
             {/* Tabs */}
-            <View style={styles.tabRow}>
-                {["Training Room", "Storage Room"].map((tab) => (
-                    <TouchableOpacity 
-                        key={tab} 
-                        style={[styles.tab, activeTab === tab && styles.activeTab]} 
-                        onPress={() => {
-                            setActiveTab(tab);
-                            setExpanded({type: null, category: null})
-                            // setOpenWarningIndex(null);
-                            // setOpenUpdatedIndex(null);
-                        }}
-                    >
-                        <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                            {tab}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+            
+            {selectedBuilding === '1' ? (<View style={styles.tabRow}>
+                
+                    {["Training Room", "Storage Room"].map((tab) => (
+                        <TouchableOpacity 
+                            key={tab} 
+                            style={[styles.tab, activeTab === tab && styles.activeTab]} 
+                            onPress={() => {
+                                setActiveTab(tab);
+                                setExpanded({type: null, category: null})
+                                // setOpenWarningIndex(null);
+                                // setOpenUpdatedIndex(null);
+                            }}
+                        >
+                            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                                {tab}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            ) : null}       
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
             
@@ -177,6 +189,19 @@ export default function HomeScreen() {
                 ))}
         </View>
         </ScrollView>
+        <View style={styles.dropdownContainer}>
+                <Dropdown
+                    style={styles.dropdownSelect}
+                    data={dropDownData}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select Building"
+                    value={selectedBuilding}
+                    onChange={item => {
+                        setSelectedBuilding(item.value);
+                    }}
+                />
+            </View>
 	</View>
 	);
 }
@@ -311,4 +336,32 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent", // invisible but catches touches
         zIndex: 5,
   },
+  dropdownContainer: {
+    position: "absolute",
+  bottom: 50,               // distance from bottom of screen
+  left: 0,
+  right: 0,
+  
+  alignItems: "center",     // centers the dropdown horizontally
+},
+
+dropdownSelect: {
+  width: "80%",             // same rounded look as your buttons
+  maxWidth: 400,
+  height: 50,
+  borderWidth: 1,
+  borderColor: "#ccc",
+  borderRadius: 10,
+  backgroundColor: "#fff",
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  elevation: 4,             // adds a soft shadow on Android
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  fontSize: 30,
+  fontWeight: 'bold'
+},
+
 });
