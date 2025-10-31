@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from "@expo/vector-icons"; // make sure expo/vector-icons is installed
-import { useRouter, Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Popup from "../components/popup"; // adjust the path depending on your folder structure
 
 
@@ -89,6 +89,10 @@ export default function DataScreen() {
         // setItem(null);
     }
 
+    const handleDeleteItem = (id: number) => {
+        setInventory(prev => prev.filter(item => item.id !== id));
+    };
+
     return (
         <View style={styles.container}>
             {/* Top Row */}
@@ -112,7 +116,7 @@ export default function DataScreen() {
                 </View>
             </View>
 
-            <Popup visible={showModal} onClose={handlePopUpClose} onSave={handleSaveItem}
+            <Popup visible={showModal} onClose={handlePopUpClose} onSave={handleSaveItem} onDelete={handleDeleteItem}
             initialValues={ item ? {
                 id: item.id,
                 itemName: item.name,
@@ -127,16 +131,17 @@ export default function DataScreen() {
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {inventory.map((item, index) => (
                     <View key={index} style={styles.dataRowContainer}>
-                        <TouchableOpacity onPress={() => handleEditItem(item)}>
-                            <Text style={[
-                                styles.itemName,
-                                item.quantity < item.minQuantity ? styles.itemNameLow : undefined
-                            ]}>
-                                {item.quantity < item.minQuantity ? '⚠ ' : ''}{item.name}
-                            </Text>
-                            {/* <Text style={styles.minText}>Min: {item.minQuantity}</Text> */}
+                        <TouchableOpacity onPress={() => handleEditItem(item)} style={styles.nameTouchable}>
+                            <View style={styles.nameContainer}>
+                                <Text style={[
+                                    styles.itemName,
+                                    item.quantity < item.minQuantity ? styles.itemNameLow : undefined
+                                ]}>
+                                    {item.quantity < item.minQuantity ? '⚠ ' : ''}{item.name}
+                                </Text>
+                                {/* <Text style={styles.minText}>Min: {item.minQuantity}</Text> */}
+                            </View>
                         </TouchableOpacity>
-                        
 
                         <View style={styles.counterGroup}>
                             <TouchableOpacity onPress={() => decrement(item.id)} style={styles.counterButton}>
@@ -206,10 +211,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "#eee",
     },
+    itemContainer: {
+        flex: 1,
+    },
     itemName: {
         flex: 1,
         fontSize: 16,
         
+    },
+    nameTouchable: {
+        flex: 1,
+        height: '100%',
+        marginRight: 10,
+    },
+    nameContainer: {
+        flex: 1,
+        justifyContent: 'center'
     },
     itemNameLow: {
         color: 'red',
