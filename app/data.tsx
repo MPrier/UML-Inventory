@@ -109,6 +109,9 @@ export default function DataScreen() {
                 </View>
                 
                 <View style={styles.topRowButtons}>
+                    <TouchableOpacity style={[styles.iconButton, styles.saveButton]}>
+                        <Ionicons name="save-outline" size={24} color="black" />
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={handleSearch} style={styles.iconButton}>
                         <Ionicons name="search" size={24} color="black" />
                     </TouchableOpacity>
@@ -198,9 +201,19 @@ const styles = StyleSheet.create({
     },
     topRowButtons: {
         flexDirection: "row",
+        alignItems: "center",
     },
+    saveButton: {
+        backgroundColor: "#e8f0fe", // soft blue background
+        borderRadius: 8,
+        padding: 6,
+      },
+
     iconButton: {
         marginLeft: 15,
+        padding: 6,
+        justifyContent: "center",
+        alignItems: "center",
     },
     backButton: {
         // padding: 5,
