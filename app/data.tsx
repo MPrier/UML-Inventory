@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons"; // make sure expo/vector-icons is installed
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Stack, useRouter, useFocusEffect } from "expo-router";
+import React, { useState, useCallback, useEffect } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert, BackHandler, Platform } from 'react-native';
 import Popup from "../components/popup"; // adjust the path depending on your folder structure
 
 
@@ -9,6 +9,7 @@ export default function DataScreen() {
     const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     const [item, setItem] = useState<any>(null);
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [inventory, setInventory] = useState([
         { id: 1, name: "1.5 White Adhesive (32 ct.)", quantity: 70, minQuantity: 50 },
         { id: 2, name: "1\" White Adhesive (48 ct.)", quantity: 8, minQuantity: 2 },
@@ -61,12 +62,19 @@ export default function DataScreen() {
         console.log("Refresh button pressed");
     };
 
+    const handleSave = () => {
+        // console.log("Save button pressed");
+        console.log("Unsaved changes:", unsavedChanges);
+        // setUnsavedChanges(false);
+    };
+
     const handlePopUpClose = () => {
         setShowModal(false);
         setItem(null);
     }
 
     const handleSaveItem = (itemData: any) => {
+        setUnsavedChanges(true);
         const lasItem = inventory[inventory.length - 1];
 
         // adding new item
@@ -95,6 +103,20 @@ export default function DataScreen() {
         setInventory(prev => prev.filter(item => item.id !== id));
     };
 
+    useEffect(() => {
+        if (Platform.OS !== "web") return; // only run on web
+        console.log('test')
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            if (!unsavedChanges) return;
+            console.log('before unload')
+            event.preventDefault();
+            event.returnValue = true; // required for Chrome
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+     }, [unsavedChanges]);
+
     return (
         <View style={styles.container}>
             {/* Top Row */}
@@ -109,7 +131,7 @@ export default function DataScreen() {
                 </View>
                 
                 <View style={styles.topRowButtons}>
-                    <TouchableOpacity style={[styles.iconButton, styles.saveButton]}>
+                    <TouchableOpacity onPress={handleSave} style={[styles.iconButton, styles.saveButton]}>
                         <Ionicons name="save-outline" size={24} color="black" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleSearch} style={styles.iconButton}>
